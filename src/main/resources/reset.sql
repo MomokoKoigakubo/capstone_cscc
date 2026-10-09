@@ -1,2 +1,2 @@
-DROP TABLE IF EXISTS feedbacklog
-DROP TABLE IF EXISTS customers
+DROP TABLE IF EXISTS feedbacklog;
+DROP TABLE IF EXISTS customers;
