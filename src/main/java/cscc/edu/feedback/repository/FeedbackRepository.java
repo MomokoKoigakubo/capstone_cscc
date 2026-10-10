@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 public class FeedbackRepository {
@@ -51,5 +52,15 @@ public class FeedbackRepository {
     public List<Customer> returnAllCustomerRows() {
         String sql = "SELECT * FROM dbo.customers";
         return jdbcClient.sql(sql).query(Customer.class).list();
+    }
+
+    public Optional<Customer> findCustomerByEmail(String email) {
+        String sql = "SELECT * FROM dbo.customers WHERE email = :email";
+        return this.jdbcClient.sql(sql).param("email", email).query(Customer.class).optional();
+    }
+
+    public void updateCustomerName(Integer customerID, String firstName, String lastName) {
+        String sql = "UPDATE dbo.customers SET firstName = :firstName, lastName = :lastName WHERE customerID = :customerID";
+        this.jdbcClient.sql(sql).param("customerID", customerID).param("firstName", firstName).param( "lastName", lastName).update();
     }
 }

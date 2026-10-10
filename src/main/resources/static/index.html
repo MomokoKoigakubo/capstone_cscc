@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Feedback Form Capstone</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link href="css/styles.css" rel="stylesheet">
@@ -16,10 +21,12 @@
         <div class="col-lg-8">
             <div class="border-2 border border-white rounded-3 p-4 billboard text-center">
                 <h1>User Feedback Form</h1>
+                <p class ="lead mb-0">Answer honestly your feedback is important to us</p>
             </div>
 
             <div class="py-3 p-3 mt-3 border-2 border border-white rounded-3 billboard">
-                <form class="row g-3">
+                <div id="formMessage"></div>
+                <form class="row g-3" id="feedbackForm">
                     <div class="col-md-6">
                         <label for="inputfname" class="form-label">First Name</label>
                         <input type="text" class="form-control" id="inputfname" placeholder="John" maxlength="50">
@@ -39,7 +46,7 @@
                         <textarea class="form-control" id="textArea" rows="8" required maxlength="1000"></textarea>
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        <button type="submit" class="btn btn-primary btn-lg">Submit Feedback</button>
                     </div>
                 </form>
             </div>
@@ -49,5 +56,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+<script src="js/feedback.js"></script>
 </body>
 </html>
