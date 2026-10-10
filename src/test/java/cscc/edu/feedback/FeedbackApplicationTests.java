@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -28,12 +28,28 @@ class FeedbackApplicationTests {
     @Test
     void saveFeedback() {
         Integer ID = null;
-        Customer customer2 = new Customer(null,
+        Customer customer = new Customer(null,
                 "Ruth", "bob", "ruthbob@gmail.com");
-        ID = repository.saveCustomer(customer2);
+        ID = repository.saveCustomer(customer);
         FeedbackLog feedback = new FeedbackLog(null,
                 "I really liked the hotel", null, ID);
         repository.saveFeedback(feedback);
+    }
+
+    @Test
+    void returnAllFeedbackRows() {
+        Integer ID = null;
+        Customer customer2 = new Customer(null,
+                "Jane", "Roe", "JaneRoe@gmail.com");
+        ID = repository.saveCustomer(customer2);
+        FeedbackLog feedback = new FeedbackLog(null,
+                "The showers were cold", null, ID);
+        repository.saveFeedback(feedback);
+        FeedbackLog feedback2 = new FeedbackLog(null,
+                "The breakfast bar had solid bagels", null, ID);
+        repository.saveFeedback(feedback2);
+
+        assertTrue(repository.returnAllFeedbackRows().size() >= 2);
     }
 
 	@Test
