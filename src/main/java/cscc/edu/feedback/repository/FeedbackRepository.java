@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Objects;
 
 @Repository
@@ -39,5 +40,10 @@ public class FeedbackRepository {
                 .param("customerID", feedbackLog.customerID())
                 .update(keyHolder, "feedbackID");
         return Objects.requireNonNull(keyHolder.getKey()).intValue();
+    }
+
+    public List<FeedbackLog> returnAllFeedbackRows() {
+        String sql = "SELECT * FROM dbo.feedbacklog";
+        return jdbcClient.sql(sql).query(FeedbackLog.class).list();
     }
 }
