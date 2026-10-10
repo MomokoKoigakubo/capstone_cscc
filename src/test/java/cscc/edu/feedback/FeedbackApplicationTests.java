@@ -38,18 +38,29 @@ class FeedbackApplicationTests {
 
     @Test
     void returnAllFeedbackRows() {
-        Integer ID = null;
+        Integer CustomerID = null;
         Customer customer2 = new Customer(null,
                 "Jane", "Roe", "JaneRoe@gmail.com");
-        ID = repository.saveCustomer(customer2);
+        CustomerID = repository.saveCustomer(customer2);
         FeedbackLog feedback = new FeedbackLog(null,
-                "The showers were cold", null, ID);
+                "The showers were cold", null, CustomerID);
         repository.saveFeedback(feedback);
         FeedbackLog feedback2 = new FeedbackLog(null,
-                "The breakfast bar had solid bagels", null, ID);
+                "The breakfast bar had solid bagels", null, CustomerID);
         repository.saveFeedback(feedback2);
 
         assertTrue(repository.returnAllFeedbackRows().size() >= 2);
+    }
+
+    @Test
+    void returnAllCustomerRows() {
+        Customer customer1 = new Customer(null,
+                "Mimi", "Salgado", "MimiS@gmail.com");
+        repository.saveCustomer(customer1);
+        Customer customer2 = new Customer(null,
+                "Razz", "Graham", "RazzG@gmail.com");
+        repository.saveCustomer(customer2);
+        assertTrue(repository.returnAllCustomerRows().size() >= 2);
     }
 
 	@Test

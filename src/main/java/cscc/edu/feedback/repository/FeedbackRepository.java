@@ -46,4 +46,10 @@ public class FeedbackRepository {
         String sql = "SELECT * FROM dbo.feedbacklog";
         return jdbcClient.sql(sql).query(FeedbackLog.class).list();
     }
+
+    // Data security this end point needs protected or we remove the function from public app
+    public List<Customer> returnAllCustomerRows() {
+        String sql = "SELECT * FROM dbo.customers";
+        return jdbcClient.sql(sql).query(Customer.class).list();
+    }
 }
