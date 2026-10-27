@@ -3,7 +3,7 @@ package cscc.edu.feedback.controller;
 import cscc.edu.feedback.model.FeedbackLog;
 import cscc.edu.feedback.repository.FeedbackRepository;
 import org.springframework.web.bind.annotation.*;
-
+import jakarta.validation.Valid;
 import java.util.List;
 
 /*
@@ -29,7 +29,7 @@ public class FeedbackController {
     }
 
     @PostMapping
-    Integer saveFeedback(@RequestBody FeedbackLog feedbackLog) {
+    Integer saveFeedback(@Valid @RequestBody FeedbackLog feedbackLog) {
         return feedbackRepository.saveFeedback(feedbackLog);
     }
 }
