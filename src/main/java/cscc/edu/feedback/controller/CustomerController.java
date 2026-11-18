@@ -16,6 +16,11 @@ public class CustomerController {
         this.feedbackRepository = feedbackRepository;
     }
 
+    @GetMapping
+    List<Customer> getAllCustomers() {
+        return feedbackRepository.returnAllCustomerRows();
+    }
+
     @PostMapping
     Integer saveCustomer(@Valid @RequestBody Customer customer) {
        Optional<Customer> exists = feedbackRepository.findCustomerByEmail(customer.email());

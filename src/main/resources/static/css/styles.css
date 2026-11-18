@@ -10,3 +10,51 @@ font-style: normal;
 .billboard {
 background-color: #3a3f4b;
 }
+
+/*owner panel*/
+.stat-label {
+color: #c9c5c2;
+font-size: .95rem;
+}
+
+.stat-value {
+font-size: 2.25rem;
+font-weight: 600;
+line-height: 1.1;
+}
+
+.stat-value-sm {
+font-size: 1.35rem;
+font-weight: 600;
+line-height: 1.2;
+}
+
+.billboard .table {
+--bs-table-bg: transparent;
+--bs-table-color: #fcf9f7;
+--bs-table-border-color: #7b8290;
+--bs-table-hover-bg: #454b59;
+--bs-table-hover-color: #fcf9f7;
+}
+
+.billboard .nav-tabs {
+--bs-nav-tabs-border-color: #7b8290;
+--bs-nav-tabs-link-active-bg: #454b59;
+--bs-nav-tabs-link-active-color: #fcf9f7;
+--bs-nav-tabs-link-active-border-color: #7b8290;
+}
+
+/*ids and counts line up down the column, the big stat numbers stay proportional*/
+.num {
+font-variant-numeric: tabular-nums;
+}
+
+.feedback-text {
+white-space: pre-wrap;
+min-width: 18rem;
+}
+
+/*dates and names read as one unit, table-responsive scrolls if it gets tight*/
+.nowrap-cell {
+white-space: nowrap;
+}
