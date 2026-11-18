@@ -1,5 +1,6 @@
 package cscc.edu.feedback.config;
 
+import cscc.edu.feedback.SecurityEventLogger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,7 +19,11 @@ import static org.springframework.security.web.servlet.util.matcher.PathPatternR
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final SecurityEventLogger securityEventLogger;
 
+    public SecurityConfig(SecurityEventLogger securityEventLogger) {
+        this.securityEventLogger = securityEventLogger;
+    }
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -39,8 +44,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
                         pathPattern(HttpMethod.POST, "/api/customers"),
                         pathPattern(HttpMethod.POST, "/api/feedback")))
-                .formLogin(Customizer.withDefaults())
+                .formLogin(form -> form
+                        .failureHandler((request, response, exception) -> {
+                            securityEventLogger.logFailedLogin(request, exception);
+                            response.sendRedirect("/login?error");
+                        })
+                )
                 .httpBasic(Customizer.withDefaults())
+                .exceptionHandling(exceptions -> exceptions
+                        .accessDeniedHandler((request, response, exception) -> {
+                            securityEventLogger.logUnauthorizedAccess(request);
+                            response.sendError(403, "Forbidden");
+                        })
+                )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .build();
     }

@@ -1,5 +1,8 @@
 package cscc.edu.feedback;
 
+import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.mockito.Mockito.verify;
 import cscc.edu.feedback.config.SecurityConfig;
 import cscc.edu.feedback.controller.CustomerController;
 import cscc.edu.feedback.repository.FeedbackRepository;
@@ -13,11 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter;
 import org.springframework.test.web.servlet.MockMvc;
 
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import cscc.edu.feedback.SecurityEventLogger;
+import org.springframework.beans.factory.annotation.Qualifier;
 @WebMvcTest(CustomerController.class)
 @Import(SecurityConfig.class)
 class SecurityConfigTests {
@@ -26,10 +31,14 @@ class SecurityConfigTests {
     MockMvc mockMvc;
 
     @Autowired
+    @Qualifier("filterChain")
     SecurityFilterChain chain;
 
     @MockitoBean
     FeedbackRepository repository;
+
+    @MockitoBean
+    SecurityEventLogger securityEventLogger;
 
     @Test
     void anonymousCustomerPostIsAllowedWithoutCsrfToken() throws Exception {
@@ -73,5 +82,29 @@ class SecurityConfigTests {
         boolean present = chain.getFilters().stream()
                 .anyMatch(filter -> filter instanceof DefaultLogoutPageGeneratingFilter);
         org.junit.jupiter.api.Assertions.assertTrue(present, "owner.html logout link needs the generated logout page");
+    }
+    @Test
+    void failedLoginTriggersSecurityLogging() throws Exception {
+        mockMvc.perform(post("/login")
+                        .param("username", "test_admin")
+                        .param("password", "wrong_password")
+                        .with(csrf()))
+                .andExpect(status().isFound());
+
+        verify(securityEventLogger)
+                .logFailedLogin(
+                        org.mockito.ArgumentMatchers.any(),
+                        org.mockito.ArgumentMatchers.any()
+                );
+    }
+    @Test
+    void csrfFailureTriggersSecurityLogging() throws Exception {
+        mockMvc.perform(post("/logout"))
+                .andExpect(status().isForbidden());
+
+        verify(securityEventLogger)
+                .logUnauthorizedAccess(
+                        org.mockito.ArgumentMatchers.any()
+                );
     }
 }
