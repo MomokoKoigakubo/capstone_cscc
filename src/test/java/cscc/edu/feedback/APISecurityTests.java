@@ -98,5 +98,32 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
                             .content(invalidFeedback))
                     .andExpect(status().isBadRequest());
         }
+        @Test
+        void incorrectAdminPasswordIsRejected() throws Exception {
+            mockMvc.perform(get("/api/feedback")
+                            .with(httpBasic("test_admin", "wrong_password")))
+                    .andExpect(status().isUnauthorized());
+        }
+        @Test
+        void rejectsFeedbackOver1000Characters() throws Exception {
+            String longFeedback = "A".repeat(1001);
 
+            String json = """
+        {
+            "feedbackContent": "%s",
+            "customerID": 1
+        }
+        """.formatted(longFeedback);
+
+            mockMvc.perform(post("/api/feedback")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(json))
+                    .andExpect(status().isBadRequest());
+        }
+        @Test
+        void anonymousUserCannotAccessCustomerEndpoint() throws Exception {
+            mockMvc.perform(get("/api/customers")
+                            .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isUnauthorized());
+        }
     }
