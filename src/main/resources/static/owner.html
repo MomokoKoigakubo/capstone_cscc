@@ -76,11 +76,36 @@
                 <div class="tab-content pt-3">
                     <div class="tab-pane fade show active" id="feedbackPane" role="tabpanel"
                          aria-labelledby="feedbackTab" tabindex="0">
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-6">
-                                <label for="feedbackSearch" class="visually-hidden">Search feedback</label>
-                                <input type="search" class="form-control" id="feedbackSearch"
+                        <form class="row g-2 mb-3 align-items-end" id="feedbackFilters" novalidate>
+                            <div class="col-lg-4 col-md-12">
+                                <label for="feedbackSearch" class="form-label stat-label mb-1">Keyword</label>
+                                <input type="search" class="form-control" id="feedbackSearch" maxlength="100"
                                        placeholder="Search feedback, name or email">
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <label for="feedbackFrom" class="form-label stat-label mb-1">From</label>
+                                <input type="date" class="form-control" id="feedbackFrom">
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <label for="feedbackTo" class="form-label stat-label mb-1">To</label>
+                                <input type="date" class="form-control" id="feedbackTo">
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <label for="feedbackSort" class="form-label stat-label mb-1">Sort</label>
+                                <select class="form-select" id="feedbackSort">
+                                    <option value="newest" selected>Newest first</option>
+                                    <option value="oldest">Oldest first</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-12 col-6 d-grid">
+                                <button type="reset" class="btn btn-outline-light" id="feedbackClear">Clear filters</button>
+                            </div>
+                        </form>
+                        <div id="filterMessage"></div>
+                        <div class="mb-3">
+                            <p class="stat-label mb-2">Most used words <span class="small">(click one to filter by it)</span></p>
+                            <div class="d-flex flex-wrap gap-2" id="topWords">
+                                <span class="stat-label small">&mdash;</span>
                             </div>
                         </div>
                         <div class="table-responsive">

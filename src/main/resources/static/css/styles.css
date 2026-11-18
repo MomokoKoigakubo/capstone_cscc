@@ -58,3 +58,9 @@ min-width: 18rem;
 .nowrap-cell {
 white-space: nowrap;
 }
+
+/*word frequency chips, the count sits in a lighter badge next to the word*/
+.word-chip .badge {
+font-variant-numeric: tabular-nums;
+}
+

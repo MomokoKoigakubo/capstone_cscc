@@ -2,11 +2,15 @@ package cscc.edu.feedback.repository;
 
 import cscc.edu.feedback.model.Customer;
 import cscc.edu.feedback.model.FeedbackLog;
+import cscc.edu.feedback.model.SortOrder;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,6 +50,56 @@ public class FeedbackRepository {
     public List<FeedbackLog> returnAllFeedbackRows() {
         String sql = "SELECT * FROM dbo.feedbacklog";
         return jdbcClient.sql(sql).query(FeedbackLog.class).list();
+    }
+
+    /*
+    * Every filter is optional. The WHERE clause is only ever built from the fixed
+    * fragments below and every value the owner typed goes in as a bound parameter, so
+    * the text of a search can never become part of the SQL itself.
+    *
+    * Dates: submitted is a datetime2, so "to = 2026-11-18" can't be compared as
+    * submitted <= '2026-11-18', that means midnight and drops everything sent later that
+    * day. The range is start of the from day up to (not including) the start of the day
+    * after to, which catches every time stamp inside the days the owner picked.
+    * */
+    public List<FeedbackLog> searchFeedback(String keyword, LocalDate from, LocalDate to, SortOrder sort) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT f.feedbackID, f.feedbackContent, f.submitted, f.customerID " +
+                "FROM dbo.feedbacklog f LEFT JOIN dbo.customers c ON c.customerID = f.customerID " +
+                "WHERE 1 = 1");
+        Map<String, Object> params = new HashMap<>();
+
+        if (keyword != null && !keyword.isBlank()) {
+            sql.append(" AND (f.feedbackContent LIKE :pattern ESCAPE '\\'" +
+                       " OR c.firstName LIKE :pattern ESCAPE '\\'" +
+                       " OR c.lastName LIKE :pattern ESCAPE '\\'" +
+                       " OR c.email LIKE :pattern ESCAPE '\\')");
+            params.put("pattern", "%" + escapeLike(keyword.trim()) + "%");
+        }
+        if (from != null) {
+            sql.append(" AND f.submitted >= :fromStart");
+            params.put("fromStart", from.atStartOfDay());
+        }
+        if (to != null) {
+            sql.append(" AND f.submitted < :toEnd");
+            params.put("toEnd", to.plusDays(1).atStartOfDay());
+        }
+        //orderBy() comes from the enum, not the request
+        sql.append(" ORDER BY ").append(sort.orderBy());
+
+        return jdbcClient.sql(sql.toString()).params(params).query(FeedbackLog.class).list();
+    }
+
+    /*
+    * Parameters stop injection, but inside LIKE the characters % _ and [ are still
+    * wildcards. Escaping them means a search for "100%" looks for that text and does
+    * not turn into "100 followed by anything".
+    * */
+    static String escapeLike(String value) {
+        return value.replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_")
+                .replace("[", "\\[");
     }
 
     // Data security this end point needs protected or we remove the function from public app

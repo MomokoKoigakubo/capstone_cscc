@@ -2,13 +2,30 @@ const FailedStatus = "alert alert-danger";
 const FailedStatusMessage = "Could not load the panel data, Please refresh the page";
 const EmptyDash = "—";
 
-const feedbackState = {rows: [], filter: ""};
+const FilterWarning = "alert alert-warning";
+const SearchDelayMs = 300;
+
+const feedbackState = {rows: [], filtered: false};
 const customerState = {rows: [], filter: ""};
+let customerByID = new Map();
+let searchTimer = null;
+let searchRequest = 0;
 
 document.addEventListener("DOMContentLoaded", loadPanel);
-document.getElementById("feedbackSearch").addEventListener("input", function (event) {
-    feedbackState.filter = event.target.value.trim().toLowerCase();
-    renderFeedback();
+//typing waits for a pause so every key press isn't its own database query
+document.getElementById("feedbackSearch").addEventListener("input", function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(searchFeedback, SearchDelayMs);
+});
+["feedbackFrom", "feedbackTo", "feedbackSort"].forEach(id =>
+    document.getElementById(id).addEventListener("change", searchFeedback));
+document.getElementById("feedbackFilters").addEventListener("submit", function (event) {
+    event.preventDefault();
+    searchFeedback();
+});
+//reset clears the inputs after this handler runs, so search on the next tick
+document.getElementById("feedbackFilters").addEventListener("reset", function () {
+    setTimeout(searchFeedback, 0);
 });
 document.getElementById("customerSearch").addEventListener("input", function (event) {
     customerState.filter = event.target.value.trim().toLowerCase();
@@ -23,8 +40,8 @@ async function loadPanel() {
         ]);
         buildState(customers, feedback);
         renderStats(customers, feedback);
-        renderFeedback();
         renderCustomers();
+        await searchFeedback();
     } catch (error) {
         //the session expired or was never there, the chain answers json calls with a 401
         if (error.status === 401 || error.status === 403) {
@@ -49,18 +66,13 @@ async function getJson(url) {
 }
 
 function buildState(customers, feedback) {
-    const customerByID = new Map(customers.map(customer => [customer.customerID, customer]));
+    customerByID = new Map(customers.map(customer => [customer.customerID, customer]));
 
     const submissionCounts = new Map();
     feedback.forEach(row => {
         const current = submissionCounts.get(row.customerID) || 0;
         submissionCounts.set(row.customerID, current + 1);
     });
-
-    //newest first, the iso strings sort the same as the dates they stand for
-    feedbackState.rows = feedback
-        .map(row => ({...row, customer: customerByID.get(row.customerID) || null}))
-        .sort((left, right) => (right.submitted || "").localeCompare(left.submitted || ""));
 
     customerState.rows = customers.map(customer => ({
         ...customer,
@@ -72,17 +84,95 @@ function renderStats(customers, feedback) {
     document.getElementById("statFeedback").textContent = feedback.length.toLocaleString();
     document.getElementById("statCustomers").textContent = customers.length.toLocaleString();
 
-    const latest = feedbackState.rows.length > 0 ? feedbackState.rows[0].submitted : null;
+    //the iso strings sort the same as the dates they stand for
+    const latest = feedback.map(row => row.submitted || "").sort().pop();
     document.getElementById("statLatest").textContent = latest ? formatDate(latest) : "No feedback yet";
 }
 
+/*
+* Filtering, sorting and the word counts happen on the server, this only reads the
+* inputs, checks the date range and sends them as query parameters.
+* */
+async function searchFeedback() {
+    const keyword = document.getElementById("feedbackSearch").value.trim();
+    const from = document.getElementById("feedbackFrom").value;
+    const to = document.getElementById("feedbackTo").value;
+    const sort = document.getElementById("feedbackSort").value;
+
+    if (from && to && from > to) {
+        filterState("The From date has to be on or before the To date", FilterWarning);
+        return;
+    }
+    filterState("", "");
+
+    const params = new URLSearchParams({sort: sort});
+    if (keyword) params.set("keyword", keyword);
+    if (from) params.set("from", from);
+    if (to) params.set("to", to);
+
+    //an older, slower response must not overwrite a newer search
+    const requestNumber = ++searchRequest;
+    try {
+        const result = await getJson("/api/feedback/search?" + params.toString());
+        if (requestNumber !== searchRequest) return;
+
+        feedbackState.filtered = Boolean(keyword || from || to);
+        feedbackState.rows = result.feedback.map(row => ({
+            ...row,
+            customer: customerByID.get(row.customerID) || null
+        }));
+        renderFeedback();
+        renderTopWords(result.topWords);
+    } catch (error) {
+        if (requestNumber !== searchRequest) return;
+        if (error.status === 401 || error.status === 403) {
+            window.location.assign("/login");
+            return;
+        }
+        console.log(error);
+        filterState("Could not run that search, check the filters and try again", FilterWarning);
+    }
+}
+
+function renderTopWords(words) {
+    const container = document.getElementById("topWords");
+    container.replaceChildren();
+
+    if (words.length === 0) {
+        const none = document.createElement("span");
+        none.className = "stat-label small";
+        none.textContent = "No words to count";
+        container.appendChild(none);
+        return;
+    }
+
+    words.forEach(entry => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "btn btn-sm btn-outline-light word-chip";
+        button.title = "Filter by \"" + entry.word + "\"";
+        button.textContent = entry.word + " ";
+
+        const badge = document.createElement("span");
+        badge.className = "badge text-bg-secondary";
+        badge.textContent = entry.count.toLocaleString();
+        button.appendChild(badge);
+
+        button.addEventListener("click", function () {
+            document.getElementById("feedbackSearch").value = entry.word;
+            searchFeedback();
+        });
+        container.appendChild(button);
+    });
+}
+
 function renderFeedback() {
-    const rows = feedbackState.rows.filter(row => matchesFeedback(row, feedbackState.filter));
+    const rows = feedbackState.rows;
     const body = document.getElementById("feedbackBody");
     body.replaceChildren();
 
     if (rows.length === 0) {
-        body.appendChild(emptyRow(feedbackState.filter ? "No feedback matches that search" : "No feedback yet"));
+        body.appendChild(emptyRow(feedbackState.filtered ? "No feedback matches those filters" : "No feedback yet"));
     } else {
         rows.forEach(row => {
             const tr = document.createElement("tr");
@@ -116,12 +206,6 @@ function renderCustomers() {
         });
     }
     document.getElementById("customerCount").textContent = rows.length.toLocaleString();
-}
-
-function matchesFeedback(row, term) {
-    if (term === "") return true;
-    return [row.feedbackContent, customerName(row.customer), row.customer ? row.customer.email : ""]
-        .some(field => (field || "").toLowerCase().includes(term));
 }
 
 function matchesCustomer(row, term) {
@@ -168,6 +252,12 @@ function formatDate(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleString(undefined, {dateStyle: "medium", timeStyle: "short"});
+}
+
+function filterState(message, type) {
+    const status = document.getElementById("filterMessage");
+    status.className = type;
+    status.textContent = message;
 }
 
 function panelState(message, type) {
