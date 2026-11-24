@@ -72,7 +72,7 @@ public class FeedbackController {
         try {
             return SortOrder.valueOf(sort.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sort must be newest or oldest");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sort must be newest, oldest, rating_low, or rating_high");
         }
     }
 }

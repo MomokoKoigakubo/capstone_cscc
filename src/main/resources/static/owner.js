@@ -5,6 +5,18 @@ const EmptyDash = "—";
 const FilterWarning = "alert alert-warning";
 const SearchDelayMs = 300;
 
+const SentimentClass = {
+    negative: "text-danger",
+    neutral: "text-warning",
+    positive: "text-success"
+};
+
+//1-2 negative, 3 neutral, 4-5 positive
+function sentimentFor(rating) {
+    if (rating <= 2) return "negative";
+    if (rating === 3) return "neutral";
+    return "positive";
+}
 const feedbackState = {rows: [], filtered: false};
 const customerState = {rows: [], filter: ""};
 let customerByID = new Map();
@@ -180,11 +192,26 @@ function renderFeedback() {
             tr.appendChild(cell(formatDate(row.submitted), "nowrap-cell"));
             tr.appendChild(cell(customerName(row.customer), "nowrap-cell"));
             tr.appendChild(cell(row.customer ? row.customer.email : EmptyDash));
+            tr.appendChild(ratingCell(row));
             tr.appendChild(cell(row.feedbackContent, "feedback-text"));
             body.appendChild(tr);
         });
     }
     document.getElementById("feedbackCount").textContent = rows.length.toLocaleString();
+}
+
+
+function ratingCell(row) {
+    const td = document.createElement("td");
+    td.className = "nowrap-cell";
+    if (row.rating === null || row.rating === undefined) {
+        td.textContent = EmptyDash;
+        return td;
+    }
+    const sentiment = sentimentFor(row.rating);
+    td.className += " fw-semibold " + SentimentClass[sentiment];
+    td.textContent = row.rating + ", " + sentiment.charAt(0).toUpperCase() + sentiment.slice(1);
+    return td;
 }
 
 function renderCustomers() {

@@ -32,7 +32,7 @@ class FeedbackApplicationTests {
                 "Ruth", "bob", "ruthbob@gmail.com");
         ID = repository.saveCustomer(customer);
         FeedbackLog feedback = new FeedbackLog(null,
-                "I really liked the hotel", null, ID);
+                "I really liked the hotel", null, ID, 5);
         repository.saveFeedback(feedback);
     }
 
@@ -43,10 +43,10 @@ class FeedbackApplicationTests {
                 "Jane", "Roe", "JaneRoe@gmail.com");
         CustomerID = repository.saveCustomer(customer2);
         FeedbackLog feedback = new FeedbackLog(null,
-                "The showers were cold", null, CustomerID);
+                "The showers were cold", null, CustomerID, 2);
         repository.saveFeedback(feedback);
         FeedbackLog feedback2 = new FeedbackLog(null,
-                "The breakfast bar had solid bagels", null, CustomerID);
+                "The breakfast bar had solid bagels", null, CustomerID, 5);
         repository.saveFeedback(feedback2);
 
         assertTrue(repository.returnAllFeedbackRows().size() >= 2);

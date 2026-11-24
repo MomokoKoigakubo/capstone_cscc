@@ -6,8 +6,10 @@ package cscc.edu.feedback.model;
 * */
 public enum SortOrder {
     NEWEST("f.submitted DESC, f.feedbackID DESC"),
-    OLDEST("f.submitted ASC, f.feedbackID ASC");
-
+    OLDEST("f.submitted ASC, f.feedbackID ASC"),
+    RATING_LOW("CASE WHEN f.rating IS NULL THEN 1 ELSE 0 END, f.rating ASC, f.submitted DESC, f.feedbackID DESC"),
+    RATING_HIGH("CASE WHEN f.rating IS NULL THEN 1 ELSE 0 END, f.rating DESC, f.submitted DESC, f.feedbackID DESC");
+    
     private final String orderBy;
 
     SortOrder(String orderBy) {
