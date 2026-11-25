@@ -58,6 +58,20 @@ public class SecurityConfig {
                         })
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives(
+                                        "default-src 'self'; " +
+                                                "script-src 'self' https://cdn.jsdelivr.net; " +
+                                                "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+                                                "font-src 'self' https://fonts.gstatic.com; " +
+                                                "img-src 'self' data:; " +
+                                                "object-src 'none'; " +
+                                                "base-uri 'self'; " +
+                                                "frame-ancestors 'none'"
+                                )
+                        )
+                )
                 .build();
     }
 }

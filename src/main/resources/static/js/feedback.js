@@ -21,7 +21,7 @@ body: JSON.stringify(customer)
 
 if(!response.ok) {
 console.log(response.status);
-formState(FailedStatusMessage, FailedStatus);
+formState(await getErrorMessage(response), FailedStatus);
 return;
 }
 let customerID = await response.json();
@@ -37,7 +37,7 @@ body: JSON.stringify({feedbackContent, customerID})
 
 if(!feedbackResponse.ok) {
 console.log(feedbackResponse.status);
-formState(FailedStatusMessage, FailedStatus);
+formState(await getErrorMessage(feedbackResponse), FailedStatus);
 return;
 }
 let answer = await feedbackResponse.json();
@@ -70,4 +70,18 @@ function formState(message, type) {
 let status = document.getElementById("formMessage");
 status.className = type;
 status.textContent = message;
+}
+async function getErrorMessage(response) {
+    try {
+        const data = await response.json();
+        if (Array.isArray(data.errors) && data.errors.length > 0) {
+            return data.errors.join(" • ");
+        }
+        if (typeof data.message === "string" && data.message.trim() !== "") {
+            return data.message;
+        }
+    } catch (_) {
+        // Fall back to default message if response body is not JSON
+    }
+    return FailedStatusMessage;
 }
