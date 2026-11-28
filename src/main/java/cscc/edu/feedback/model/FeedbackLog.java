@@ -10,4 +10,4 @@ public record FeedbackLog(
         LocalDateTime submitted,
         Integer customerID,
         @NotNull @Max(5) @Min(1) Integer rating
-        ) {}
+) {}

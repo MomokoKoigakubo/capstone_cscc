@@ -32,7 +32,7 @@ class FeedbackApplicationTests {
                 "Ruth", "bob", "ruthbob@gmail.com");
         ID = repository.saveCustomer(customer);
         FeedbackLog feedback = new FeedbackLog(null,
-                "I really liked the hotel",null, ID, 5);
+                "I really liked the hotel", null, ID, 5);
         repository.saveFeedback(feedback);
     }
 
@@ -63,8 +63,8 @@ class FeedbackApplicationTests {
         assertTrue(repository.returnAllCustomerRows().size() >= 2);
     }
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

@@ -4,8 +4,12 @@
 * feedbacklog goes first, it holds the foreign key into customers.
 * */
 
-DELETE FROM dbo.feedbacklog;
-DELETE FROM dbo.customers;
+DELETE
+FROM dbo.feedbacklog;
+DELETE
+FROM dbo.customers;
 
-DBCC CHECKIDENT ('dbo.feedbacklog', RESEED, 0);
-DBCC CHECKIDENT ('dbo.customers', RESEED, 0);
+DBCC
+CHECKIDENT ('dbo.feedbacklog', RESEED, 0);
+DBCC
+CHECKIDENT ('dbo.customers', RESEED, 0);

@@ -3,6 +3,7 @@ package cscc.edu.feedback;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.mockito.Mockito.verify;
+
 import cscc.edu.feedback.config.SecurityConfig;
 import cscc.edu.feedback.controller.CustomerController;
 import cscc.edu.feedback.repository.FeedbackRepository;
@@ -21,8 +22,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import cscc.edu.feedback.SecurityEventLogger;
 import org.springframework.beans.factory.annotation.Qualifier;
+
 @WebMvcTest(CustomerController.class)
 @Import(SecurityConfig.class)
 class SecurityConfigTests {
@@ -73,16 +76,17 @@ class SecurityConfigTests {
     }
 
     /*
-    * owner.html logs out through a plain link because static html cannot carry a
-    * csrf token. That link only works while spring generates the logout page, so a
-    * custom login page added later must not quietly drop this filter.
-    * */
+     * owner.html logs out through a plain link because static html cannot carry a
+     * csrf token. That link only works while spring generates the logout page, so a
+     * custom login page added later must not quietly drop this filter.
+     * */
     @Test
     void generatedLogoutPageIsAvailableForTheOwnerPanelLink() {
         boolean present = chain.getFilters().stream()
                 .anyMatch(filter -> filter instanceof DefaultLogoutPageGeneratingFilter);
         org.junit.jupiter.api.Assertions.assertTrue(present, "owner.html logout link needs the generated logout page");
     }
+
     @Test
     void failedLoginTriggersSecurityLogging() throws Exception {
         mockMvc.perform(post("/login")
@@ -97,6 +101,7 @@ class SecurityConfigTests {
                         org.mockito.ArgumentMatchers.any()
                 );
     }
+
     @Test
     void csrfFailureTriggersSecurityLogging() throws Exception {
         mockMvc.perform(post("/logout"))

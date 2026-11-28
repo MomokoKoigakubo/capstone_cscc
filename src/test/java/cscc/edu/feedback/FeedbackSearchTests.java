@@ -54,7 +54,7 @@ class FeedbackSearchTests {
 
     @Test
     void searchWithNoFiltersReturnsEverythingNewestFirst() throws Exception {
-        when(repository.searchFeedback(isNull(), isNull(), isNull(), eq(SortOrder.NEWEST)))
+        when(repository.searchFeedback(isNull(), isNull(), isNull(), isNull(), eq(SortOrder.NEWEST)))
                 .thenReturn(List.of(
                         new FeedbackLog(2, "Delivery was late, delivery driver was rude", LocalDateTime.now(), 1, 1),
                         new FeedbackLog(1, "Late delivery again", LocalDateTime.now(), 1, 3)));
@@ -69,28 +69,29 @@ class FeedbackSearchTests {
 
     @Test
     void filtersArePassedThroughToTheRepository() throws Exception {
-        when(repository.searchFeedback(any(), any(), any(), any())).thenReturn(List.of());
+        when(repository.searchFeedback(any(), any(), any(),  any(), any())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/feedback/search").with(owner())
                         .param("keyword", "late")
                         .param("from", "2026-11-01")
                         .param("to", "2026-11-18")
+                        .param("rating", "4")
                         .param("sort", "oldest"))
                 .andExpect(status().isOk());
 
-        verify(repository).searchFeedback("late", LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 18), SortOrder.OLDEST);
+        verify(repository).searchFeedback("late", LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 18), 4, SortOrder.OLDEST);
     }
 
     @Test
     void injectionTextIsTreatedAsAKeyword() throws Exception {
         String attack = "'; DROP TABLE dbo.feedbacklog; --";
-        when(repository.searchFeedback(any(), any(), any(), any())).thenReturn(List.of());
+        when(repository.searchFeedback(any(), any(), any(), any(), any())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/feedback/search").with(owner()).param("keyword", attack))
                 .andExpect(status().isOk());
 
         //handed to the repository as a value, which binds it as a parameter
-        verify(repository).searchFeedback(eq(attack), isNull(), isNull(), eq(SortOrder.NEWEST));
+        verify(repository).searchFeedback(eq(attack), isNull(), isNull(), isNull(), eq(SortOrder.NEWEST));
     }
 
     @Test
@@ -117,8 +118,8 @@ class FeedbackSearchTests {
     }
 
     @Test
-    void overlongKeywordIsRejected() throws Exception {
-        mockMvc.perform(get("/api/feedback/search").with(owner()).param("keyword", "a".repeat(101)))
+    void ratingOutOfRangeIsRejected() throws Exception {
+        mockMvc.perform(get("/api/feedback/search").with(owner()).param("rating", "6"))
                 .andExpect(status().isBadRequest());
         verifyNoInteractions(repository);
     }

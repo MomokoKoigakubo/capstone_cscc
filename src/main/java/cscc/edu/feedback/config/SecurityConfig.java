@@ -12,10 +12,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher.pathPattern;
 
 /*
-* Without this bean Spring Boot secures every request, which would put the public
-* feedback form and its css/js behind a login. Customers stay anonymous, the owner
-* panel and the reads it depends on require a login.
-* */
+ * Without this bean Spring Boot secures every request, which would put the public
+ * feedback form and its css/js behind a login. Customers stay anonymous, the owner
+ * panel and the reads it depends on require a login.
+ * */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -24,6 +24,7 @@ public class SecurityConfig {
     public SecurityConfig(SecurityEventLogger securityEventLogger) {
         this.securityEventLogger = securityEventLogger;
     }
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -37,10 +38,10 @@ public class SecurityConfig {
                         //owner panel pages plus every GET on the api
                         .anyRequest().authenticated())
                 /*
-                * The two public POSTs are anonymous, so there are no credentials for a
-                * forged request to ride on and nothing for a CSRF token to protect. Scoped
-                * to POST so panel actions added later keep their protection.
-                * */
+                 * The two public POSTs are anonymous, so there are no credentials for a
+                 * forged request to ride on and nothing for a CSRF token to protect. Scoped
+                 * to POST so panel actions added later keep their protection.
+                 * */
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
                         pathPattern(HttpMethod.POST, "/api/customers"),
                         pathPattern(HttpMethod.POST, "/api/feedback")))

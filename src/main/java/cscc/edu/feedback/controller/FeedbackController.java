@@ -1,25 +1,31 @@
 package cscc.edu.feedback.controller;
 
+import cscc.edu.feedback.FeedbackCSV;
 import cscc.edu.feedback.WordFrequency;
 import cscc.edu.feedback.model.FeedbackLog;
 import cscc.edu.feedback.model.FeedbackSearchResult;
 import cscc.edu.feedback.model.SortOrder;
+import cscc.edu.feedback.model.TrendPoint;
 import cscc.edu.feedback.repository.FeedbackRepository;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
 /*
-* @Get Mapping   = HTTP:Get    -> read data
-* @PostMapping   = HTTP:POST   -> Create or submits new data
-* @PutMapping    = HTTP:PUT    -> update data
-* @DeleteMapping = HTTP:DELETE -> delete data
-* */
+ * @Get Mapping   = HTTP:Get    -> read data
+ * @PostMapping   = HTTP:POST   -> Create or submits new data
+ * @PutMapping    = HTTP:PUT    -> update data
+ * @DeleteMapping = HTTP:DELETE -> delete data
+ * */
 
 //This tells spring to turn return values into JSON
 @RestController
@@ -34,17 +40,45 @@ public class FeedbackController {
         this.feedbackRepository = feedbackRepository;
     }
 
+    private static SortOrder parseSort(String sort) {
+        try {
+            return SortOrder.valueOf(sort.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sort must be newest or oldest");
+        }
+    }
+
     @GetMapping
     List<FeedbackLog> getAllFeedback() {
         return feedbackRepository.returnAllFeedbackRows();
     }
 
+    @GetMapping("/trends")
+    List<TrendPoint> getTrendMonth() {
+        return feedbackRepository.trendsByMonth();
+    }
+
+    @GetMapping("/export")
+    ResponseEntity<String> exportFeedback(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) Integer rating,
+            @RequestParam(defaultValue = "newest") String sort) {
+
+        List<FeedbackLog> feedback = feedbackRepository.searchFeedback(keyword, from, to, rating, parseSort(sort));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"feedback.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(FeedbackCSV.toCSV(feedback));
+    }
+
     /*
-    * GET /api/feedback/search?keyword=late&from=2026-11-01&to=2026-11-18&sort=newest
-    * Every parameter is optional, with none of them this is every row newest first.
-    * Dates only take the ISO yyyy-MM-dd form (what an <input type="date"> sends), anything
-    * else is a 400 instead of a guess at what the owner meant.
-    * */
+     * GET /api/feedback/search?keyword=late&from=2026-11-01&to=2026-11-18&sort=newest
+     * Every parameter is optional, with none of them this is every row newest first.
+     * Dates only take the ISO yyyy-MM-dd form (what an <input type="date"> sends), anything
+     * else is a 400 instead of a guess at what the owner meant.
+     * */
     @GetMapping("/search")
     FeedbackSearchResult searchFeedback(
             @RequestParam(required = false) String keyword,
@@ -60,20 +94,16 @@ public class FeedbackController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from date must be on or before the to date");
         }
 
-        List<FeedbackLog> feedback = feedbackRepository.searchFeedback(keyword, from, to, parseSort(sort));
+        if (rating != null && (rating < 1 || rating > 5)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Rating must be between 1 and 5 inclusive");
+        }
+
+        List<FeedbackLog> feedback = feedbackRepository.searchFeedback(keyword, from, to, rating, parseSort(sort));
         return new FeedbackSearchResult(feedback, WordFrequency.topWords(feedback, TopWordLimit));
     }
 
     @PostMapping
     Integer saveFeedback(@Valid @RequestBody FeedbackLog feedbackLog) {
         return feedbackRepository.saveFeedback(feedbackLog);
-    }
-
-    private static SortOrder parseSort(String sort) {
-        try {
-            return SortOrder.valueOf(sort.trim().toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sort must be newest or oldest");
-        }
     }
 }

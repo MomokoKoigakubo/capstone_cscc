@@ -30,6 +30,7 @@ public class SecurityEventLogger {
                 ip,
                 event.getException().getClass().getSimpleName());
     }
+
     public void logFailedLogin(
             HttpServletRequest request,
             Exception exception) {
@@ -40,6 +41,7 @@ public class SecurityEventLogger {
                 exception.getClass().getSimpleName()
         );
     }
+
     public void logUnauthorizedAccess(HttpServletRequest request) {
         log.warn("SECURITY EVENT: Unauthorized access; method={}; path={}",
                 request.getMethod(),

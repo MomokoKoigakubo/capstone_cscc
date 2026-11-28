@@ -1,17 +1,18 @@
 <!doctype html>
-<html lang="en" data-bs-theme="dark">
+<html data-bs-theme="dark" lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
     <title>Feedback Form Capstone</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body class="background">
@@ -22,63 +23,63 @@
         <div class="col-lg-8">
             <!--owner.html is behind the login, so this sends the owner to /login first and then on to the panel-->
             <div class="d-flex justify-content-end mb-3">
-                <a href="owner.html" class="btn btn-primary">Owner login</a>
+                <a class="btn btn-primary" href="owner.html">Owner login</a>
             </div>
             <div class="border-2 border border-white rounded-3 p-4 billboard text-center">
                 <h1>User Feedback Form</h1>
-                <p class ="lead mb-0">Answer honestly your feedback is important to us</p>
+                <p class="lead mb-0">Answer honestly your feedback is important to us</p>
             </div>
 
             <div class="py-3 p-3 mt-3 border-2 border border-white rounded-3 billboard">
                 <div id="formMessage"></div>
                 <form class="row g-3" id="feedbackForm">
                     <div class="col-md-6">
-                        <label for="inputfname" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="inputfname" placeholder="John" maxlength="50">
+                        <label class="form-label" for="inputfname">First Name</label>
+                        <input class="form-control" id="inputfname" maxlength="50" placeholder="John" type="text">
                     </div>
                     <div class="col-md-6">
-                        <label for="inputlname" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="inputlname" placeholder="Doe" required
-                               maxlength="75">
+                        <label class="form-label" for="inputlname">Last Name</label>
+                        <input class="form-control" id="inputlname" maxlength="75" placeholder="Doe" required
+                               type="text">
                     </div>
                     <div class="col-12">
-                        <label for="inputEmail" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="inputEmail" placeholder="JohnDoe@student.cscc.edu"
-                               required maxlength="70">
+                        <label class="form-label" for="inputEmail">Email Address</label>
+                        <input class="form-control" id="inputEmail" maxlength="70" placeholder="JohnDoe@student.cscc.edu"
+                               required type="email">
                     </div>
                     <div class="col-12">
-                        <label for="textArea" class="form-label">Your Feedback</label>
-                        <textarea class="form-control" id="textArea" rows="8" required maxlength="1000"></textarea>
+                        <label class="form-label" for="textArea">Your Feedback</label>
+                        <textarea class="form-control" id="textArea" maxlength="1000" required rows="8"></textarea>
                     </div>
 
                     <div class="col-md-6">
-                            <h5 class="mb-1">Interactive Star Rating</h5>
-                            <div class="star-rating animated-stars">
-                                <input type="radio" id="star5" name="rating" value="5" required>
-                                <label for="star5" class="bi bi-star-fill"></label>
-                                <input type="radio" id="star4" name="rating" value="4">
-                                <label for="star4" class="bi bi-star-fill"></label>
-                                <input type="radio" id="star3" name="rating" value="3">
-                                <label for="star3" class="bi bi-star-fill"></label>
-                                <input type="radio" id="star2" name="rating" value="2">
-                                <label for="star2" class="bi bi-star-fill"></label>
-                                <input type="radio" id="star1" name="rating" value="1">
-                                <label for="star1" class="bi bi-star-fill"></label>
-                            </div>
-                            <p class="text-muted mt-2">Click to rate</p>
+                        <h5 class="mb-1">Interactive Star Rating</h5>
+                        <div class="star-rating animated-stars">
+                            <input id="star5" name="rating" required type="radio" value="5">
+                            <label class="bi bi-star-fill" for="star5"></label>
+                            <input id="star4" name="rating" type="radio" value="4">
+                            <label class="bi bi-star-fill" for="star4"></label>
+                            <input id="star3" name="rating" type="radio" value="3">
+                            <label class="bi bi-star-fill" for="star3"></label>
+                            <input id="star2" name="rating" type="radio" value="2">
+                            <label class="bi bi-star-fill" for="star2"></label>
+                            <input id="star1" name="rating" type="radio" value="1">
+                            <label class="bi bi-star-fill" for="star1"></label>
                         </div>
+                        <p class="text-muted mt-2">Click to rate</p>
+                    </div>
 
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary btn-lg">Submit Feedback</button>
+                        <button class="btn btn-primary btn-lg" type="submit">Submit Feedback</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+<script crossorigin="anonymous"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/feedback.js"></script>
 </body>
 </html>

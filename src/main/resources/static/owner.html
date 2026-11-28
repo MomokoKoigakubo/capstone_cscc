@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en" data-bs-theme="dark">
+<html data-bs-theme="dark" lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
     <title>Owner Panel Capstone</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body class="background">
@@ -26,13 +27,13 @@
                         <h1 class="mb-0">Owner Panel</h1>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="index.html" class="btn btn-outline-light">Feedback form</a>
-                        <a href="/logout" class="btn btn-primary">Log out</a>
+                        <a class="btn btn-outline-light" href="index.html">Feedback form</a>
+                        <a class="btn btn-primary" href="/logout">Log out</a>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-3">
+            <div class="row g-3 mt-3">
                 <div class="col-md-4">
                     <div class="h-100 p-3 border-2 border border-white rounded-3 billboard">
                         <p class="stat-label mb-1">Total feedback</p>
@@ -54,56 +55,79 @@
             </div>
 
             <div class="py-3 p-3 mt-3 border-2 border border-white rounded-3 billboard">
+                <p class="stat-label mb-2">Feedback per month</p>
+                <canvas height="90" id="trendChart"></canvas>
+            </div>
+
+            <div class="py-3 p-3 mt-3 border-2 border border-white rounded-3 billboard">
                 <div id="panelMessage"></div>
 
                 <ul class="nav nav-tabs" id="panelTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="feedbackTab" data-bs-toggle="tab"
-                                data-bs-target="#feedbackPane" type="button" role="tab"
-                                aria-controls="feedbackPane" aria-selected="true">
+                        <button aria-controls="feedbackPane" aria-selected="true" class="nav-link active"
+                                data-bs-target="#feedbackPane" data-bs-toggle="tab" id="feedbackTab"
+                                role="tab" type="button">
                             Feedback <span class="badge text-bg-secondary num" id="feedbackCount">0</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="customersTab" data-bs-toggle="tab"
-                                data-bs-target="#customersPane" type="button" role="tab"
-                                aria-controls="customersPane" aria-selected="false">
+                        <button aria-controls="customersPane" aria-selected="false" class="nav-link"
+                                data-bs-target="#customersPane" data-bs-toggle="tab" id="customersTab"
+                                role="tab" type="button">
                             Customers <span class="badge text-bg-secondary num" id="customerCount">0</span>
                         </button>
                     </li>
                 </ul>
 
                 <div class="tab-content pt-3">
-                    <div class="tab-pane fade show active" id="feedbackPane" role="tabpanel"
-                         aria-labelledby="feedbackTab" tabindex="0">
+                    <div aria-labelledby="feedbackTab" class="tab-pane fade show active" id="feedbackPane"
+                         role="tabpanel" tabindex="0">
                         <form class="row g-2 mb-3 align-items-end" id="feedbackFilters" novalidate>
-                            <div class="col-lg-4 col-md-12">
-                                <label for="feedbackSearch" class="form-label stat-label mb-1">Keyword</label>
-                                <input type="search" class="form-control" id="feedbackSearch" maxlength="100"
-                                       placeholder="Search feedback, name or email">
+                            <div class="col-lg-2 col-md-12">
+                                <label class="form-label stat-label mb-1" for="feedbackSearch">Keyword</label>
+                                <input class="form-control" id="feedbackSearch" maxlength="100"
+                                       placeholder="Search feedback, name or email"
+                                       type="search">
                             </div>
                             <div class="col-lg-2 col-md-4 col-6">
-                                <label for="feedbackFrom" class="form-label stat-label mb-1">From</label>
-                                <input type="date" class="form-control" id="feedbackFrom">
+                                <label class="form-label stat-label mb-1" for="feedbackFrom">From</label>
+                                <input class="form-control" id="feedbackFrom" type="date">
                             </div>
                             <div class="col-lg-2 col-md-4 col-6">
-                                <label for="feedbackTo" class="form-label stat-label mb-1">To</label>
-                                <input type="date" class="form-control" id="feedbackTo">
+                                <label class="form-label stat-label mb-1" for="feedbackTo">To</label>
+                                <input class="form-control" id="feedbackTo" type="date">
                             </div>
                             <div class="col-lg-2 col-md-4 col-6">
-                                <label for="feedbackSort" class="form-label stat-label mb-1">Sort</label>
+                                <label class="form-label stat-label mb-1" for="feedbackRating">Ratings</label>
+                                <select class="form-select" id="feedbackRating">
+                                    <option selected value="">All ratings</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-4 col-6">
+                                <label class="form-label stat-label mb-1" for="feedbackSort">Sort</label>
                                 <select class="form-select" id="feedbackSort">
-                                    <option value="newest" selected>Newest first</option>
+                                    <option selected value="newest">Newest first</option>
                                     <option value="oldest">Oldest first</option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-12 col-6 d-grid">
-                                <button type="reset" class="btn btn-outline-light" id="feedbackClear">Clear filters</button>
+                                <button class="btn btn-outline-light" id="feedbackClear" type="reset">Clear filters
+                                </button>
                             </div>
                         </form>
                         <div id="filterMessage"></div>
+                        <div class="d-flex justify-content-end mb-2">
+                            <button type="button" class="btn btn-outline-light" id="exportCsv">Export CSV</button>
+                        </div>
+
                         <div class="mb-3">
-                            <p class="stat-label mb-2">Most used words <span class="small">(click one to filter by it)</span></p>
+                            <p class="stat-label mb-2">Most used words <span
+                                    class="small">(click one to filter by it)</span></p>
                             <div class="d-flex flex-wrap gap-2" id="topWords">
                                 <span class="stat-label small">&mdash;</span>
                             </div>
@@ -114,6 +138,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Submitted</th>
+                                    <th scope="col">Rating</th>
                                     <th scope="col">Customer</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Feedback</th>
@@ -121,20 +146,20 @@
                                 </thead>
                                 <tbody id="feedbackBody">
                                 <tr>
-                                    <td colspan="5" class="text-center stat-label py-4">Loading feedback&hellip;</td>
+                                    <td class="text-center stat-label py-4" colspan="6">Loading feedback&hellip;</td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div class="tab-pane fade" id="customersPane" role="tabpanel"
-                         aria-labelledby="customersTab" tabindex="0">
+                    <div aria-labelledby="customersTab" class="tab-pane fade" id="customersPane"
+                         role="tabpanel" tabindex="0">
                         <div class="row g-2 mb-3">
                             <div class="col-md-6">
-                                <label for="customerSearch" class="visually-hidden">Search customers</label>
-                                <input type="search" class="form-control" id="customerSearch"
-                                       placeholder="Search name or email">
+                                <label class="visually-hidden" for="customerSearch">Search customers</label>
+                                <input class="form-control" id="customerSearch" placeholder="Search name or email"
+                                       type="search">
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -150,7 +175,7 @@
                                 </thead>
                                 <tbody id="customerBody">
                                 <tr>
-                                    <td colspan="5" class="text-center stat-label py-4">Loading customers&hellip;</td>
+                                    <td class="text-center stat-label py-4" colspan="5">Loading customers&hellip;</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -162,9 +187,10 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+<script crossorigin="anonymous"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="owner.js"></script>
 </body>
 </html>

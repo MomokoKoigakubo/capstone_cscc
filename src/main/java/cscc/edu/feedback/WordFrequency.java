@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 /*
-* Counts the words across a set of feedback so the owner can see what customers keep
-* bringing up. Filler words are dropped or they would always win.
-* */
+ * Counts the words across a set of feedback so the owner can see what customers keep
+ * bringing up. Filler words are dropped or they would always win.
+ * */
 public final class WordFrequency {
     private static final int MinWordLength = 3;
 
@@ -27,7 +27,8 @@ public final class WordFrequency {
             "got", "one", "really", "i'm", "i've", "don't", "didn't", "wasn't", "isn't"
     );
 
-    private WordFrequency() {}
+    private WordFrequency() {
+    }
 
     public static List<WordCount> topWords(List<FeedbackLog> feedback, int limit) {
         Map<String, Long> counts = new HashMap<>();

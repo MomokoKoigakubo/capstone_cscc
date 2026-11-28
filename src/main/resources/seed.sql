@@ -1,15 +1,3 @@
-/*
-* Display data for the owner panel, generated from reviews_small_file.csv.
-* Run by hand after schema.sql, nothing here runs on startup while
-* spring.sql.init.mode stays never:
-*   sqlcmd -S <server> -d FeedbackDB -U <user> -C -b -i src/main/resources/seed.sql
-*
-* 23199 reviews. Reviews over 1000 characters were cut at a word and end
-* with "...", blank reviews and exact repeats (same email and text) were left out.
-* Rows go into a temp table first, then customers are added once per email and
-* feedback is joined to them by email. Safe to run twice, existing rows are skipped.
-* */
-
 SET NOCOUNT ON;
 
 CREATE TABLE #reviews (

@@ -17,7 +17,7 @@ document.getElementById("feedbackSearch").addEventListener("input", function () 
     clearTimeout(searchTimer);
     searchTimer = setTimeout(searchFeedback, SearchDelayMs);
 });
-["feedbackFrom", "feedbackTo", "feedbackSort"].forEach(id =>
+["feedbackFrom", "feedbackTo", "feedbackRating", "feedbackSort"].forEach(id =>
     document.getElementById(id).addEventListener("change", searchFeedback));
 document.getElementById("feedbackFilters").addEventListener("submit", function (event) {
     event.preventDefault();
@@ -31,6 +31,11 @@ document.getElementById("customerSearch").addEventListener("input", function (ev
     customerState.filter = event.target.value.trim().toLowerCase();
     renderCustomers();
 });
+document.getElementById("exportCsv").addEventListener("click", function () {
+    const params = filterParams();
+    if (!params) return;
+    window.location.assign("/api/feedback/export?" + params.toString());
+});
 
 async function loadPanel() {
     try {
@@ -42,6 +47,7 @@ async function loadPanel() {
         renderStats(customers, feedback);
         renderCustomers();
         await searchFeedback();
+        await loadTrends();
     } catch (error) {
         //the session expired or was never there, the chain answers json calls with a 401
         if (error.status === 401 || error.status === 403) {
@@ -54,6 +60,43 @@ async function loadPanel() {
         clearBody("customerBody", "Customers unavailable");
     }
 }
+
+async function loadTrends() {
+    const points = await getJson("/api/feedback/trends");
+    const labels = points.map(point => point.month.slice(0, 7));
+    const totals = points.map(point => point.totalReviews);
+    const averages = points.map(point => point.avgRating);
+
+    new Chart(document.getElementById("trendChart"), {
+        data: {
+            labels: labels,
+            datasets: [
+                {type: "bar", label: "Reviews", data: totals, yAxisID: "count", backgroundColor: "#4e79a7"},
+                {
+                    type: "line",
+                    label: "Average rating",
+                    data: averages,
+                    yAxisID: "stars",
+                    borderColor: "#f2b134",
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            scales: {
+                count: {position: "left", beginAtZero: true, title: {display: true, text: "Reviews"}},
+                stars: {
+                    position: "right",
+                    min: 1,
+                    max: 5,
+                    grid: {drawOnChartArea: false},
+                    title: {display: true, text: "Avg stars"}
+                }
+            }
+        }
+    });
+}
+
 
 async function getJson(url) {
     const response = await fetch(url, {headers: {"Accept": "application/json"}});
@@ -89,14 +132,12 @@ function renderStats(customers, feedback) {
     document.getElementById("statLatest").textContent = latest ? formatDate(latest) : "No feedback yet";
 }
 
-/*
-* Filtering, sorting and the word counts happen on the server, this only reads the
-* inputs, checks the date range and sends them as query parameters.
-* */
-async function searchFeedback() {
+
+function filterParams() {
     const keyword = document.getElementById("feedbackSearch").value.trim();
     const from = document.getElementById("feedbackFrom").value;
     const to = document.getElementById("feedbackTo").value;
+    const rating = document.getElementById("feedbackRating").value;
     const sort = document.getElementById("feedbackSort").value;
 
     if (from && to && from > to) {
@@ -109,6 +150,19 @@ async function searchFeedback() {
     if (keyword) params.set("keyword", keyword);
     if (from) params.set("from", from);
     if (to) params.set("to", to);
+    if (rating) params.set("rating", rating);
+
+    return params;
+}
+
+
+/*
+* Filtering, sorting and the word counts happen on the server, this only reads the
+* inputs, checks the date range and sends them as query parameters.
+* */
+async function searchFeedback() {
+    const params = filterParams();
+    if (!params) return;
 
     //an older, slower response must not overwrite a newer search
     const requestNumber = ++searchRequest;
@@ -116,7 +170,7 @@ async function searchFeedback() {
         const result = await getJson("/api/feedback/search?" + params.toString());
         if (requestNumber !== searchRequest) return;
 
-        feedbackState.filtered = Boolean(keyword || from || to);
+        feedbackState.filtered = params.has("keyword") || params.has("from") || params.has("to") || params.has("rating");
         feedbackState.rows = result.feedback.map(row => ({
             ...row,
             customer: customerByID.get(row.customerID) || null
@@ -178,6 +232,7 @@ function renderFeedback() {
             const tr = document.createElement("tr");
             tr.appendChild(cell(row.feedbackID, "num"));
             tr.appendChild(cell(formatDate(row.submitted), "nowrap-cell"));
+            tr.appendChild(cell("*".repeat(row.rating), "nowrap-cell"));
             tr.appendChild(cell(customerName(row.customer), "nowrap-cell"));
             tr.appendChild(cell(row.customer ? row.customer.email : EmptyDash));
             tr.appendChild(cell(row.feedbackContent, "feedback-text"));
@@ -234,7 +289,7 @@ function cell(value, className) {
 function emptyRow(message) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = 5;
+    td.colSpan = 6;
     td.className = "text-center stat-label py-4";
     td.textContent = message;
     tr.appendChild(td);
