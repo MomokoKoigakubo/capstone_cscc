@@ -64,7 +64,7 @@ public class SecurityConfig {
                                         "default-src 'self'; " +
                                                 "script-src 'self' https://cdn.jsdelivr.net; " +
                                                 "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
-                                                "font-src 'self' https://fonts.gstatic.com; " +
+                                                "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
                                                 "img-src 'self' data:; " +
                                                 "object-src 'none'; " +
                                                 "base-uri 'self'; " +

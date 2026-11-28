@@ -5,6 +5,7 @@ const FailedStatusMessage = "Something went wrong, Please try again";
 
 
 const feedbackForm = document.getElementById("feedbackForm");
+
 feedbackForm.addEventListener("submit", submission);
 
 async function submission(event) {
@@ -12,7 +13,6 @@ event.preventDefault();
 let customer = { firstName: "", lastName: "", email: ""};
 customer = getValue(customer);
 if(customer != null) {
-
 const response = await fetch("/api/customers", {
 method: "POST",
 headers: { "Content-Type": "application/json" },
@@ -27,12 +27,13 @@ return;
 let customerID = await response.json();
 console.log(customerID);
 
-let feedbackContent = document.getElementById("textArea").value.trim();
+const feedbackContent = document.getElementById("textArea").value.trim();
+const rating = parseInt(document.querySelector('input[name="rating"]:checked').value);
 
 const feedbackResponse = await fetch("/api/feedback", {
 method: "POST",
 headers: { "Content-Type": "application/json" },
-body: JSON.stringify({feedbackContent, customerID})
+body: JSON.stringify({feedbackContent, customerID, rating})
 });
 
 if(!feedbackResponse.ok) {
@@ -85,3 +86,13 @@ async function getErrorMessage(response) {
     }
     return FailedStatusMessage;
 }
+
+
+document.querySelectorAll('.star-rating:not(.readonly) label').forEach(star => {
+    star.addEventListener('click', function() {
+        this.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            this.style.transform = 'scale(1)';
+        }, 200);
+    });
+});

@@ -50,6 +50,7 @@ public class FeedbackController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) Integer rating,
             @RequestParam(defaultValue = "newest") String sort) {
 
         if (keyword != null && keyword.length() > MaxKeywordLength) {

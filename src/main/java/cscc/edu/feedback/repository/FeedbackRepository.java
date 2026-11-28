@@ -38,10 +38,11 @@ public class FeedbackRepository {
     public Integer saveFeedback(FeedbackLog feedbackLog) {
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
 
-        String sql = "INSERT INTO dbo.feedbacklog (feedbackContent, customerID) values (" +
-                " :feedbackContent, :customerID) ";
+        String sql = "INSERT INTO dbo.feedbacklog (feedbackContent, rating, customerID) values (" +
+                " :feedbackContent, :rating ,:customerID) ";
         this.jdbcClient.sql(sql)
                 .param("feedbackContent",  feedbackLog.feedbackContent())
+                .param("rating", feedbackLog.rating())
                 .param("customerID", feedbackLog.customerID())
                 .update(keyHolder, "feedbackID");
         return Objects.requireNonNull(keyHolder.getKey()).intValue();
@@ -64,7 +65,7 @@ public class FeedbackRepository {
     * */
     public List<FeedbackLog> searchFeedback(String keyword, LocalDate from, LocalDate to, SortOrder sort) {
         StringBuilder sql = new StringBuilder(
-                "SELECT f.feedbackID, f.feedbackContent, f.submitted, f.customerID " +
+                "SELECT f.feedbackID, f.feedbackContent, f.rating, f.submitted, f.customerID " +
                 "FROM dbo.feedbacklog f LEFT JOIN dbo.customers c ON c.customerID = f.customerID " +
                 "WHERE 1 = 1");
         Map<String, Object> params = new HashMap<>();

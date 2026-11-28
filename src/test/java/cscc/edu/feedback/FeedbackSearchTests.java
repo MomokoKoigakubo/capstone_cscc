@@ -56,8 +56,8 @@ class FeedbackSearchTests {
     void searchWithNoFiltersReturnsEverythingNewestFirst() throws Exception {
         when(repository.searchFeedback(isNull(), isNull(), isNull(), eq(SortOrder.NEWEST)))
                 .thenReturn(List.of(
-                        new FeedbackLog(2, "Delivery was late, delivery driver was rude", LocalDateTime.now(), 1),
-                        new FeedbackLog(1, "Late delivery again", LocalDateTime.now(), 1)));
+                        new FeedbackLog(2, "Delivery was late, delivery driver was rude", LocalDateTime.now(), 1, 1),
+                        new FeedbackLog(1, "Late delivery again", LocalDateTime.now(), 1, 3)));
 
         mockMvc.perform(get("/api/feedback/search").with(owner()))
                 .andExpect(status().isOk())
